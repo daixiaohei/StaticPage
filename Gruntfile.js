@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         },
         buildType: 'Build',
         pkg: grunt.file.readJSON('package.json'),
-        archive_name: grunt.option('name') || 'StaticPage项目名称', //此处可根据自己的需求修改
+        archive_name: grunt.option('name') || 'StaticPage', //此处可根据自己的需求修改
 
         //清理掉开发时才需要的文件
         clean: {
@@ -201,7 +201,17 @@ module.exports = function(grunt) {
             }
 
         },
-
+        connect: {
+          server: {
+            options: {
+              port: 4001,
+              base: '',
+              keepalive:true,
+              open:true,
+              hostname: '*'
+            }
+          }
+        },
         //发布到FTP服务器 : 请注意密码安全，ftp的帐号密码保存在主目录 .ftppass 文件
         'ftp-deploy': {
             build: {
@@ -219,9 +229,9 @@ module.exports = function(grunt) {
         'sftp-deploy': {
             build: {
                 auth: {
-                    host: 'yoursftp.domain.com',
-                    port: 22,
-                    authKey: 'key1'
+                    host: '120.197.88.71',
+                    port: 1212,
+                    authKey: 'key2'
                 },
                 cache: 'sftpCache.json',
                 src: 'build',
@@ -240,11 +250,13 @@ module.exports = function(grunt) {
         grunt.log.writeln(target + ': ' + '文件: ' + filepath + ' 变动状态: ' + action);
     });
 
+  
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
@@ -253,7 +265,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-closure-compiler'); //增加谷歌高级压缩
     grunt.loadNpmTasks('grunt-imageoptim');
     /*下方为配置的常用 grunt 命令*/
-    grunt.registerTask('default', ['cssmin', 'uglify', 'htmlmin', 'copy:images']);
+   // grunt.registerTask('default', ['cssmin', 'uglify', 'htmlmin', 'copy:images']);
+    grunt.registerTask('default',['connect','watch']);
     grunt.registerTask('styles', ['sass:admin', 'cssmin']);
     //执行 grunt bundle --最终输出的文件 < name-生成日期.zip > 文件
     grunt.registerTask('bundle', ['clean:pre', 'copy:images', 'copy:main', 'cssmin', 'copy:archive', 'clean:post', 'htmlmin', 'compress', ]);
@@ -263,5 +276,7 @@ module.exports = function(grunt) {
     grunt.registerTask('ssh', ['sftp-deploy']);
     //执行 grunt gcc 可进行谷歌压缩
     grunt.registerTask('gcc', ['closure-compiler']);
+    //
+    grunt.registerTask('server', ['connect']);
 
 };
